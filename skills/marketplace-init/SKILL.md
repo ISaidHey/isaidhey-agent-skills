@@ -1,117 +1,75 @@
 ---
 name: marketplace-init
-description: Set up a Claude Code plugin marketplace in a target directory. Use when creating a new marketplace, scaffolding marketplace structure, or initializing plugin distribution.
-disable-model-invocation: true
-arguments: [dir, name]
-argument-hint: <dir> [marketplace-name]
-allowed-tools: Bash(mkdir *) Bash(ls *) Write Read
+description: Use when initializing a new Claude Code plugin marketplace, setting up plugin distribution infrastructure, creating a plugin registry, or sharing and distributing Claude plugins with a team or publicly.
+arguments: [name, dir, owner-name, owner-email, description]
+argument-hint: [name] [dir] [owner-name] [owner-email] [description]
+allowed-tools: Bash(bash scripts/init.sh*)
 ---
 
 # Marketplace Init
 
-Set up a Claude Code plugin marketplace at `$dir`.
+## Overview
 
-## Reference docs
-- Schema fields and reserved names: [schema.md](docs/schema.md)
-- Plugin source types: [sources.md](docs/sources.md)
-- Version management: [versioning.md](docs/versioning.md)
-- Validation and testing: [validation.md](docs/validation.md)
+A marketplace is a registry that groups plugins for distribution. It lives in a `.claude-plugin/marketplace.json` file and lets users install plugins with `/plugin install <plugin>@<marketplace-name>`. This skill scaffolds that structure interactively, prompting for any fields not pre-supplied.
 
-## Steps
+## When to Use
 
-### 1. Validate target directory
+- Starting a new plugin marketplace from scratch
+- Setting up plugin distribution for a team or project
+- Creating a new plugin registry
 
-If `$dir` is empty, ask:
+## When NOT to Use
 
-> "Where should the marketplace be created? (provide a directory path)"
+- Marketplace already exists at the target path — the script will error; use the existing file directly
+- Adding plugins to an existing marketplace — edit `marketplace.json` directly
+- Updating marketplace metadata — edit `marketplace.json` directly
 
-Then check if a marketplace already exists at that path:
+## Instructions
 
-```bash
-ls $dir/.claude-plugin/marketplace.json 2>/dev/null
-```
+Run [scripts/init.sh](scripts/init.sh), appending any pre-supplied arguments:
+- `--name "$name"` if `$name` is set
+- `--dir "$dir"` if `$dir` is set
+- `--owner-name "$owner_name"` if `$owner_name` is set
+- `--owner-email "$owner_email"` if `$owner_email` is set
+- `--description "$description"` if `$description` is set
 
-If the file exists, stop with this message:
+Any omitted arguments are prompted interactively by the script.
 
-> "A marketplace already exists at `$dir/.claude-plugin/marketplace.json`. Aborting to avoid overwriting it."
+On non-zero exit, show the stderr output to the user. Ask whether they want to troubleshoot the error or cancel, and proceed accordingly.
 
-### 2. Validate marketplace name
-
-Use `$name` if provided. Otherwise, ask:
-
-> "What should the marketplace be named? (kebab-case, e.g. `acme-tools`)"
-
-Requirements (see docs/schema.md for reserved names list):
-- Lowercase letters, numbers, hyphens only
-- No spaces, no uppercase letters
-- Not a reserved name
-
-If invalid, explain the specific problem and ask again.
-
-### 3. Collect owner name
-
-Ask:
-
-> "What is your name or team name? (shown as the marketplace maintainer)"
-
-Required. Ask again if the user submits empty input.
-
-### 4. Collect owner email
-
-Ask:
-
-> "Owner email address? (optional — press Enter to skip)"
-
-Accept empty input and proceed.
-
-### 5. Collect description
-
-Ask:
-
-> "Describe this marketplace in one sentence:"
-
-Required. Ask again if the user submits empty input.
-
-### 6. Create files
-
-Run:
-
-```bash
-mkdir -p $dir/.claude-plugin
-```
-
-Write `$dir/.claude-plugin/marketplace.json` with the values collected above:
-
-```json
-{
-  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
-  "name": "<collected-name>",
-  "description": "<collected-description>",
-  "version": "1.0.0",
-  "owner": {
-    "name": "<collected-owner-name>",
-    "email": "<collected-email>"
-  },
-  "plugins": []
-}
-```
-
-Omit the `"email"` line entirely if the user skipped it.
-
-### 7. Show next steps
-
-Print:
+On success, parse the JSON stdout for `dir`, `name`, and `path`. Display:
 
 ```
-✓ Marketplace created at $dir/.claude-plugin/marketplace.json
+✓ Marketplace created at <path>
 
 Next steps:
-1. Validate:  claude plugin validate $dir
-2. Add:       /plugin marketplace add $dir
-3. Install:   /plugin install <plugin-name>@<collected-name>
-
-Version is set to "1.0.0". Bump it on each release, or remove it entirely
-to track git commit SHA automatically (every commit = new version).
+1. Validate:  claude plugin validate <dir>
+2. Add:       /plugin marketplace add <dir>
+3. Install:   /plugin install <plugin-name>@<name>
 
 Add plugins to the plugins[] array in marketplace.json when ready.
 ```
+
+## Example
+
+```
+/marketplace-init my-team-tools . "Acme Corp" tools@acme.com "Internal tools for Acme devs"
+```
+
+Equivalent to running `init.sh` with all five args pre-supplied — no interactive prompts.
+
+## Common Mistakes
+
+| Mistake | Error | Fix |
+|---------|-------|-----|
+| Reserved name (`agent-skills`, `anthropic-marketplace`, etc.) | `Invalid: '<name>' is a reserved name` | Choose a unique name — see `docs/schema.md` for the full reserved list |
+| Name has uppercase / spaces / leading or trailing hyphen | `Invalid: must be lowercase letters, numbers, and hyphens only` | Use kebab-case: `my-team-tools` not `My Tools` |
+| Target dir already has `marketplace.json` | `Error: marketplace already exists at <path>` | Edit the existing file; do not re-run init |
+
+## Reference
+
+- Schema fields and reserved names: [docs/schema.md](docs/schema.md)
+- Plugin source types: [docs/sources.md](docs/sources.md)
+- Version management: [docs/versioning.md](docs/versioning.md)
+- Validation and testing: [docs/validation.md](docs/validation.md)
+- Hosting and team distribution: [docs/distribution.md](docs/distribution.md)
