@@ -131,11 +131,12 @@ create_skill() {
   mkdir -p "$skill_dir"
 
   local skill_desc="${OPT_SKILL_DESCRIPTION:-${OPT_SKILL_NAME} skill}"
+  local yaml_desc="${skill_desc//\'/\'\'}"
 
   printf '%s\n' \
     "---" \
     "name: $OPT_SKILL_NAME" \
-    "description: $skill_desc" \
+    "description: '${yaml_desc}'" \
     "disable-model-invocation: true" \
     "---" \
     "" \
