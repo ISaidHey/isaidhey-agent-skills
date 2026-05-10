@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "isaidhey-agent-skills",
+  "description": "Core skills used in my day to day process",
+  "version": "1.0.0",
+  "owner": {
+    "name": "isaidhey"
+  },
+  "plugins": []
+}

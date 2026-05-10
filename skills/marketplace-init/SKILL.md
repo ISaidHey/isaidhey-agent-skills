@@ -3,7 +3,7 @@ name: marketplace-init
 description: Use when initializing a new Claude Code plugin marketplace, setting up plugin distribution infrastructure, creating a plugin registry, or sharing and distributing Claude plugins with a team or publicly.
 arguments: [name, dir, owner-name, owner-email, description]
 argument-hint: [name] [dir] [owner-name] [owner-email] [description]
-allowed-tools: Bash(bash scripts/init.sh*)
+allowed-tools: Bash(bash *)
 ---
 
 # Marketplace Init
@@ -33,14 +33,20 @@ A marketplace is a registry that groups plugins for distribution. It lives in a 
 
 ## Instructions
 
-Run [scripts/init.sh](scripts/init.sh), appending any pre-supplied arguments:
-- `--name "$name"` if `$name` is set
-- `--dir "$dir"` if `$dir` is set
-- `--owner-name "$owner_name"` if `$owner_name` is set
-- `--owner-email "$owner_email"` if `$owner_email` is set
-- `--description "$description"` if `$description` is set
+**Step 1 — Collect missing args.**
 
-Any omitted arguments are prompted interactively by the script.
+Identify which of the five fields are not pre-supplied. If any are missing, ask for all of them in a single message as a numbered list. Wait for the user's reply, then map answers to fields by order or by explicit field name if the user labels them. If `owner-email` is blank or skipped, omit `--owner-email` entirely.
+
+**Step 2 — Run the script once with all args.**
+
+```
+bash "${CLAUDE_SKILL_DIR}/scripts/init.sh" \
+  --name "$name" \
+  --dir "$dir" \
+  --owner-name "$owner_name" \
+  [--owner-email "$owner_email"  ← omit if skipped] \
+  --description "$description"
+```
 
 On non-zero exit, show the stderr output to the user. Ask whether they want to troubleshoot the error or cancel, and proceed accordingly.
 
@@ -77,7 +83,7 @@ Equivalent to running `init.sh` with all five args pre-supplied — no interacti
 
 ## Reference
 
-- Schema fields and reserved names: [docs/schema.md](docs/schema.md)
+- Schema fields and reserved names: [docs/schema.md](./docs/schema.md)
 - Plugin source types: [docs/sources.md](docs/sources.md)
 - Version management: [docs/versioning.md](docs/versioning.md)
 - Validation and testing: [docs/validation.md](docs/validation.md)
