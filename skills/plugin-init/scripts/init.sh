@@ -121,7 +121,31 @@ create_plugin() {
 }
 
 # Stubs — replaced in Tasks 3 and 4
-create_skill()    { :; }
+create_skill() {
+  if [[ ! "$OPT_SKILL_NAME" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)*$ ]]; then
+    echo "Invalid: skill name must be lowercase letters, numbers, and hyphens only" >&2
+    exit 1
+  fi
+
+  local skill_dir="$DIR/skills/$OPT_SKILL_NAME"
+  mkdir -p "$skill_dir"
+
+  local skill_desc="${OPT_SKILL_DESCRIPTION:-${OPT_SKILL_NAME} skill}"
+
+  printf '%s\n' \
+    "---" \
+    "name: $OPT_SKILL_NAME" \
+    "description: $skill_desc" \
+    "disable-model-invocation: true" \
+    "---" \
+    "" \
+    "# $OPT_SKILL_NAME" \
+    "" \
+    "TODO: Add skill instructions here." \
+    > "$skill_dir/SKILL.md"
+
+  RESULT_SKILL_CREATED="$OPT_SKILL_NAME"
+}
 register_plugin() { :; }
 
 # ---------------------------------------------------------------------------
