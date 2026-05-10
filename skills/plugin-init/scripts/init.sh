@@ -72,7 +72,7 @@ if [[ ! "$OPT_NAME" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)*$ ]]; then
 fi
 
 # Resolve plugin dir once; all functions use $DIR
-DIR="$(realpath --canonicalize-missing -- "$OPT_DIR")"
+DIR="$(realpath --canonicalize-missing -- "$OPT_DIR")" || { echo "Error: cannot resolve path: $OPT_DIR" >&2; exit 1; }
 
 # Result variables — written by functions, assembled into JSON at end
 RESULT_NAME="$OPT_NAME"
@@ -82,3 +82,70 @@ RESULT_SKILL_CREATED=""
 RESULT_REGISTERED=false
 RESULT_MARKETPLACE_NAME=""
 RESULT_MARKETPLACE_DIR_OUT=""
+
+# ---------------------------------------------------------------------------
+create_plugin() {
+  local plugin_json="$DIR/.claude-plugin/plugin.json"
+
+  if [[ -f "$plugin_json" ]]; then
+    echo "Error: plugin already exists at $plugin_json" >&2
+    exit 1
+  fi
+
+  mkdir -p "$DIR/.claude-plugin"
+
+  if [[ -n "$OPT_AUTHOR_NAME" && -n "$OPT_AUTHOR_EMAIL" ]]; then
+    jq -n \
+      --arg name  "$OPT_NAME" \
+      --arg desc  "$OPT_DESCRIPTION" \
+      --arg aname "$OPT_AUTHOR_NAME" \
+      --arg email "$OPT_AUTHOR_EMAIL" \
+      '{"name":$name,"description":$desc,"version":"1.0.0","author":{"name":$aname,"email":$email}}' \
+      > "$plugin_json"
+  elif [[ -n "$OPT_AUTHOR_NAME" ]]; then
+    jq -n \
+      --arg name  "$OPT_NAME" \
+      --arg desc  "$OPT_DESCRIPTION" \
+      --arg aname "$OPT_AUTHOR_NAME" \
+      '{"name":$name,"description":$desc,"version":"1.0.0","author":{"name":$aname}}' \
+      > "$plugin_json"
+  else
+    jq -n \
+      --arg name "$OPT_NAME" \
+      --arg desc "$OPT_DESCRIPTION" \
+      '{"name":$name,"description":$desc,"version":"1.0.0"}' \
+      > "$plugin_json"
+  fi
+
+  RESULT_PLUGIN_JSON="$plugin_json"
+}
+
+# Stubs — replaced in Tasks 3 and 4
+create_skill()    { :; }
+register_plugin() { :; }
+
+# ---------------------------------------------------------------------------
+# Main flow
+[[ "$OPT_NO_CREATE" == false ]] && create_plugin
+[[ -n "$OPT_SKILL_NAME" ]]      && create_skill
+[[ "$OPT_REGISTER" == true ]]   && register_plugin
+
+# ---------------------------------------------------------------------------
+# Emit result JSON
+jq -n \
+  --arg  dir              "$RESULT_DIR" \
+  --arg  name             "$RESULT_NAME" \
+  --arg  plugin_json      "$RESULT_PLUGIN_JSON" \
+  --arg  skill_created    "$RESULT_SKILL_CREATED" \
+  --arg  registered       "$RESULT_REGISTERED" \
+  --arg  marketplace_name "$RESULT_MARKETPLACE_NAME" \
+  --arg  marketplace_dir  "$RESULT_MARKETPLACE_DIR_OUT" \
+  '{
+    dir:              $dir,
+    name:             $name,
+    plugin_json:      $plugin_json,
+    skill_created:    (if $skill_created    == "" then null else $skill_created    end),
+    registered:       ($registered == "true"),
+    marketplace_name: (if $marketplace_name == "" then null else $marketplace_name end),
+    marketplace_dir:  (if $marketplace_dir  == "" then null else $marketplace_dir  end)
+  }'
