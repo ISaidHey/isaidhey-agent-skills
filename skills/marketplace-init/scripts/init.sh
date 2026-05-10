@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+command -v jq      >/dev/null 2>&1 || { echo "Error: jq is required. Install: apt install jq / brew install jq" >&2; exit 1; }
+realpath --version >/dev/null 2>&1 || { echo "Error: GNU realpath is required. Install: brew install coreutils (macOS)" >&2; exit 1; }
+
 RESERVED_NAMES=(
   "claude-code-marketplace"
   "claude-code-plugins"

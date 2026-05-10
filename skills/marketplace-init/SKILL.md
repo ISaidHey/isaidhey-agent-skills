@@ -24,6 +24,13 @@ A marketplace is a registry that groups plugins for distribution. It lives in a 
 - Adding plugins to an existing marketplace — edit `marketplace.json` directly
 - Updating marketplace metadata — edit `marketplace.json` directly
 
+## Prerequisites
+
+| Dependency | Check | Install |
+|------------|-------|---------|
+| `jq` | `jq --version` | `apt install jq` / `brew install jq` |
+| GNU `realpath` | `realpath --version` | pre-installed on Linux; macOS: `brew install coreutils` |
+
 ## Instructions
 
 Run [scripts/init.sh](scripts/init.sh), appending any pre-supplied arguments:
@@ -65,6 +72,8 @@ Equivalent to running `init.sh` with all five args pre-supplied — no interacti
 | Reserved name (`agent-skills`, `anthropic-marketplace`, etc.) | `Invalid: '<name>' is a reserved name` | Choose a unique name — see `docs/schema.md` for the full reserved list |
 | Name has uppercase / spaces / leading or trailing hyphen | `Invalid: must be lowercase letters, numbers, and hyphens only` | Use kebab-case: `my-team-tools` not `My Tools` |
 | Target dir already has `marketplace.json` | `Error: marketplace already exists at <path>` | Edit the existing file; do not re-run init |
+| `jq` not installed | `Error: jq is required` | `apt install jq` or `brew install jq` |
+| GNU `realpath` missing (macOS) | `realpath: illegal option -- -` | `brew install coreutils` |
 
 ## Reference
 
