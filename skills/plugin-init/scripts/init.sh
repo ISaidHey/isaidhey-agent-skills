@@ -147,7 +147,46 @@ create_skill() {
 
   RESULT_SKILL_CREATED="$OPT_SKILL_NAME"
 }
-register_plugin() { :; }
+register_plugin() {
+  local marketplace_json="$OPT_MARKETPLACE_DIR/.claude-plugin/marketplace.json"
+
+  if [[ ! -f "$marketplace_json" ]]; then
+    echo "Error: marketplace.json not found at $marketplace_json" >&2
+    exit 1
+  fi
+
+  # Reject duplicate plugin name
+  local existing
+  existing=$(jq -r --arg n "$OPT_NAME" '.plugins[] | select(.name == $n) | .name' "$marketplace_json")
+  if [[ -n "$existing" ]]; then
+    echo "Error: plugin '$OPT_NAME' is already registered in this marketplace" >&2
+    exit 1
+  fi
+
+  # Determine source: use override if provided, else compute relative path
+  local source
+  if [[ -n "$OPT_MARKETPLACE_SOURCE" ]]; then
+    source="$OPT_MARKETPLACE_SOURCE"
+  else
+    local rel
+    rel="$(realpath --relative-to="$OPT_MARKETPLACE_DIR" "$DIR")"
+    source="./$rel"
+  fi
+
+  # Append plugin entry to marketplace.json
+  local updated
+  updated=$(jq \
+    --arg name "$OPT_NAME" \
+    --arg src  "$source" \
+    --arg desc "$OPT_DESCRIPTION" \
+    '.plugins += [{"name":$name,"source":$src,"description":$desc}]' \
+    "$marketplace_json")
+  echo "$updated" > "$marketplace_json"
+
+  RESULT_REGISTERED=true
+  RESULT_MARKETPLACE_NAME="$(jq -r '.name' "$marketplace_json")"
+  RESULT_MARKETPLACE_DIR_OUT="$(realpath --canonicalize-missing -- "$OPT_MARKETPLACE_DIR")"
+}
 
 # ---------------------------------------------------------------------------
 # Main flow
