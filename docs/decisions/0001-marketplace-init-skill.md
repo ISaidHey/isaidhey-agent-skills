@@ -2,7 +2,7 @@
 type: decision
 id: "0001"
 title: "Automate marketplace scaffolding with marketplace-init skill"
-status: accepted
+status: active
 date: 2026-05-10
 superseded_by: ""
 ---

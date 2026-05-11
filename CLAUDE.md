@@ -4,10 +4,14 @@ Guidance for Claude Code (claude.ai/code) working in this repo.
 
 ## What This Repo Is
 
-Claude Code plugin marketplace. `scaffold-skills` plugin ships two skills for scaffolding plugin infrastructure:
+Claude Code plugin marketplace. Two plugins:
 
+**`scaffold-skills`** — scaffolding plugin:
 - `scaffold-skills:marketplace-init` — interactive scaffold for `marketplace.json`
 - `scaffold-skills:plugin-init` — interactive scaffold for plugin dir + optional skill + optional marketplace registration
+
+**`isaidhey`** (`core-skills/`) — core day-to-day skills:
+- `isaidhey:decided` — canonical cross-project ADR documenter
 
 ## Development Commands
 
@@ -66,7 +70,7 @@ Discrete fns called from main flow:
 
 ```
 .claude-plugin/marketplace.json     ← marketplace catalog
-scaffold-skills/                    ← the plugin
+scaffold-skills/                    ← scaffolding plugin
   .claude-plugin/plugin.json
   skills/
     marketplace-init/
@@ -77,9 +81,14 @@ scaffold-skills/                    ← the plugin
       SKILL.md
       scripts/init.sh
       docs/                         ← schema, components, skill-authoring, distribution, dependencies
+core-skills/                        ← isaidhey plugin (core day-to-day skills)
+  .claude-plugin/plugin.json
+  skills/
+    decided/
+      SKILL.md                      ← canonical cross-project ADR documenter
 docs/
   raw/                              ← upstream Claude Code docs (source material for distilled docs)
-  decisions/                        ← ADRs (0001 marketplace-init, 0002 plugin-init)
+  decisions/                        ← ADRs (0001 marketplace-init, 0002 plugin-init, 0003 decided)
 ```
 
 ## Reference Docs
@@ -92,3 +101,9 @@ docs/
 - `scaffold-skills/skills/plugin-init/docs/skill-authoring.md` — writing effective SKILL.md files
 - `docs/decisions/0001-marketplace-init-skill.md` — ADR for marketplace-init design
 - `docs/decisions/0002-plugin-init-skill.md` — ADR for plugin-init design
+- `docs/decisions/0003-decided-canonical-adr-skill.md` — ADR for decided skill design
+- `docs/decisions/index.md` — ADR index
+
+## ADR Directory
+
+ADRs are stored in `docs/decisions/`.

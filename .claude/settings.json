@@ -1,5 +1,6 @@
 {
   "enabledPlugins": {
-    "scaffold-skills@isaidhey-agent-skills": true
+    "scaffold-skills@isaidhey-agent-skills": true,
+    "isaidhey@isaidhey-agent-skills": true
   }
 }

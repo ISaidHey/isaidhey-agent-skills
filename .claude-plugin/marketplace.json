@@ -15,6 +15,14 @@
         "./skills/marketplace-init",
         "./skills/plugin-init"
       ]
+    },
+    {
+      "name": "isaidhey",
+      "source": "./core-skills",
+      "description": "Core skills for day to day processes",
+      "skills": [
+        "./skills/decided"
+      ]
     }
   ]
 }
