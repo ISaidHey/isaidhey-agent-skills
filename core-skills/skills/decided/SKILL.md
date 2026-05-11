@@ -73,76 +73,7 @@ Ask the user which format they want — or suggest based on complexity:
 - **Simple** — clear decision, low complexity, few/no alternatives
 - **Full** — multiple options weighed, significant consequences, worth capturing the full reasoning trail
 
-### Simple
-
-```markdown
----
-type: decision
-id: "0042"
-title: "Short decision title"
-status: proposed
-date: YYYY-MM-DD
-superseded_by: ""
----
-
-## Context
-What situation or constraint led to this?
-
-## Decision
-**One sentence. Bold. What was decided.**
-
-## Consequences
-What becomes easier or harder. **Re-evaluate if:** [condition].
-
-## Invariants
-Load-bearing constraints any superseding decision must explicitly address — either preserve or consciously override with justification.
-```
-
-### Full
-
-```markdown
----
-type: decision
-id: "0042"
-title: "Short decision title"
-status: proposed
-date: YYYY-MM-DD
-superseded_by: ""
-responsible: ""   # does the work
-accountable: ""   # owns the outcome, final sign-off
-consulted: ""     # two-way input sought
-informed: ""      # one-way, kept in the loop
----
-
-## Context
-What situation or constraint led to this? What problem is it solving?
-
-## Decision drivers
-- [force, constraint, or desired quality]
-- [another driver]
-
-## Decision
-**Chosen: "[Option A]", because [one-sentence justification].**
-
-## Options considered
-
-### Option A (chosen)
-- Good: …
-- Bad: …
-
-### Option B
-- Good: …
-- Bad: why rejected
-
-## Consequences
-What becomes easier or harder. **Re-evaluate if:** [condition].
-
-## Confirmation
-How to verify this decision is being followed — automated checks, code review criteria, fitness functions, or architectural tests. Omit if not applicable.
-
-## Invariants
-Load-bearing constraints any superseding decision must explicitly address — either preserve or consciously override with justification.
-```
+Read [templates.md](templates.md) for both template formats.
 
 ## Directory layout
 
@@ -270,55 +201,7 @@ Load-bearing constraints any superseding decision must explicitly address — ei
 
    **8c. Targeted lint**
 
-   For each touched file, run the following checks. Fix any failure immediately before reporting completion — same contract as step 7.
-
-   **For each touched decision file (`NNNN-*.md`):**
-
-   ```bash
-   FILE="<ADR_DIR>/NNNN-slug.md"   # substitute actual path
-
-   # Check 1: required fields present
-   for field in type id title status date; do
-     rg -q "^${field}:" "$FILE" || echo "FAIL check 1: missing field '$field' in $FILE"
-   done
-
-   # Check 2: valid status value
-   status=$(rg -m1 "^status:" "$FILE" | sed 's/^status: *//')
-   echo "$status" | rg -q "^(proposed|rejected|active|superseded|retired)$" \
-     || echo "FAIL check 2: invalid status '$status' in $FILE"
-
-   # Check 3: if superseded, superseded_by must be non-empty wikilink
-   if [ "$status" = "superseded" ]; then
-     sb=$(rg -m1 "^superseded_by:" "$FILE" | sed 's/^superseded_by: *//' | tr -d '"')
-     [ -z "$sb" ] \
-       && echo "FAIL check 3: status is superseded but superseded_by is empty in $FILE"
-
-     # Check 4: wikilink target resolves
-     target=$(echo "$sb" | sed 's/\[\[//;s/\]\]//')
-     [ -f "<ADR_DIR>/${target}.md" ] \
-       || echo "FAIL check 4: superseded_by target not found: <ADR_DIR>/${target}.md"
-   fi
-
-   # Check 5: id is unique across all decision files
-   id=$(rg -m1 "^id:" "$FILE" | sed 's/^id: *//' | tr -d '"')
-   count=$(rg -l "^id: \"${id}\"" <ADR_DIR>/[0-9]*.md | wc -l | tr -d ' ')
-   [ "$count" -gt 1 ] \
-     && echo "FAIL check 5: id '$id' appears in $count files"
-   ```
-
-   **For `<ADR_DIR>/index.md`:**
-
-   ```bash
-   BASENAME=$(basename "$FILE")
-
-   # Check 6: touched decision file appears in index
-   rg -q "$BASENAME" <ADR_DIR>/index.md \
-     || echo "FAIL check 6: $BASENAME not found in <ADR_DIR>/index.md"
-
-   # Check 7: index markdown link for this file points to existing file
-   rg "\($BASENAME\)" <ADR_DIR>/index.md | rg -q . \
-     || echo "FAIL check 7: no markdown link for $BASENAME in index"
-   ```
+   For each touched file, run lint checks defined in [lint-checks.md](lint-checks.md). Fix any failure immediately before reporting completion — same contract as step 7.
 
 ## Workflow: supersede existing decision
 
