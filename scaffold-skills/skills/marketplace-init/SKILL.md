@@ -2,7 +2,7 @@
 name: marketplace-init
 description: Use when initializing a new Claude Code plugin marketplace, setting up plugin distribution infrastructure, creating a plugin registry, or sharing and distributing Claude plugins with a team or publicly.
 arguments: [name, dir, owner-name, owner-email, description]
-argument-hint: [name] [dir] [owner-name] [owner-email] [description]
+argument-hint: "[name] [dir] [owner-name] [owner-email] [description]"
 allowed-tools: Bash(bash *)
 ---
 

@@ -6,5 +6,15 @@
   "owner": {
     "name": "isaidhey"
   },
-  "plugins": []
+  "plugins": [
+    {
+      "name": "scaffold-skills",
+      "source": "./scaffold-skills",
+      "description": "Collection of skills for scaffolding various claude code needs",
+      "skills": [
+        "./skills/marketplace-init",
+        "./skills/plugin-init"
+      ]
+    }
+  ]
 }

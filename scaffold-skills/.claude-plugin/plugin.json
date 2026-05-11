@@ -1,0 +1,8 @@
+{
+  "name": "scaffold-skills",
+  "description": "Collection of skills for scaffolding various claude code needs",
+  "version": "1.0.0",
+  "author": {
+    "name": "isaidhey"
+  }
+}

@@ -1,55 +1,94 @@
 # CLAUDE.md
 
-Guidance for Claude Code (claude.ai/code) when working in this repo.
+Guidance for Claude Code (claude.ai/code) working in this repo.
 
 ## What This Repo Is
 
-Claude Code plugin skill repo. Hosts `marketplace-init` skill — Bash interactive scaffold generator for Claude Code plugin marketplaces.
+Claude Code plugin marketplace. `scaffold-skills` plugin ships two skills for scaffolding plugin infrastructure:
+
+- `scaffold-skills:marketplace-init` — interactive scaffold for `marketplace.json`
+- `scaffold-skills:plugin-init` — interactive scaffold for plugin dir + optional skill + optional marketplace registration
 
 ## Development Commands
 
-No build system. No package manager. Skills run directly.
+No build system. No package manager. Run scripts directly.
 
-**Test the script manually:**
 ```bash
-bash skills/marketplace-init/scripts/init.sh --help
-bash skills/marketplace-init/scripts/init.sh --name my-marketplace --dir /tmp/test-market --owner-name "Test User" --owner-email test@example.com --description "test"
+# marketplace-init
+bash scaffold-skills/skills/marketplace-init/scripts/init.sh --help
+bash scaffold-skills/skills/marketplace-init/scripts/init.sh \
+  --name my-marketplace --dir /tmp/test-market \
+  --owner-name "Test User" --owner-email test@example.com --description "test"
+
+# plugin-init
+bash scaffold-skills/skills/plugin-init/scripts/init.sh --help
+bash scaffold-skills/skills/plugin-init/scripts/init.sh \
+  --name my-plugin --dir /tmp/test-plugin --description "test" --author-name "Test User"
 ```
 
-**Check runtime deps before running:**
-```bash
-command -v jq && jq --version
-realpath --version 2>/dev/null || echo "GNU realpath missing"
-```
+Runtime deps: `jq`, GNU `realpath` (macOS: `brew install coreutils`). `claude` CLI optional (plugin-init post-creation validation only).
 
 ## Architecture
 
-Two-file execution model:
+Each skill: two-file model.
 
-1. **`skills/marketplace-init/SKILL.md`** — Skill manifest. Claude Code runtime reads this; defines invocation, prompts, calls `init.sh`, parses stdout JSON.
-2. **`skills/marketplace-init/scripts/init.sh`** — Worker script. Validation, interactive prompts, file creation, emits single JSON line to stdout.
+- **`SKILL.md`** — manifest read by Claude Code; drives conversation flow, collects args, calls `init.sh`, renders JSON result
+- **`scripts/init.sh`** — worker; validates input, creates files, emits single JSON to stdout
 
-Data flow: `User invokes /marketplace-init` → SKILL.md parses args → `init.sh` runs → stdout JSON → SKILL.md renders result.
+SKILL.md = UX source of truth. `init.sh` = pure mechanics, never prompts user.
 
-**`init.sh` flow (line ranges):**
-- `:1-60` — dep checks, option parsing, `--help`
-- `:62-81` — name validation (regex + reserved list)
-- `:83-127` — interactive directory selection menu
-- `:129-147` — owner name/email/description prompts
-- `:149-157` — path canonicalization + pre-write safety check
-- `:159-192` — create dir, write `marketplace.json` via `jq`
-- `:194-196` — emit JSON result to stdout
+### `marketplace-init/scripts/init.sh`
 
-## Critical Constraints (from ADR 0001)
+Field collection entirely in bash:
+- `:25-53` — arg parsing + reserved name check (`is_reserved`)
+- `:62-81` — name validation
+- `:83-128` — directory selection menu (numbered list of candidates)
+- `:129-157` — owner name / email / description prompts + path canonicalization
+- `:159-193` — create dirs, write `marketplace.json` via `jq`
+- `:194-196` — emit JSON to stdout
 
-- All user-supplied values pass through `jq --arg`, never string-interpolated — prevents JSON injection
-- Name regex: `^[a-z][a-z0-9]*(-[a-z0-9]+)*$` — rejects trailing/double hyphens
+### `plugin-init/scripts/init.sh`
+
+Discrete fns called from main flow:
+- `:87` `create_plugin()` — writes `.claude-plugin/plugin.json`
+- `:124` `create_skill()` — writes `skills/<name>/SKILL.md` placeholder
+- `:150` `register_plugin()` — appends plugin entry to `marketplace.json`; discovers `skills/*/SKILL.md`, includes in entry's `skills` array
+- `:217-221` — main flow: calls fns conditionally based on flags
+
+## Critical Constraints
+
+- All user-supplied values pass through `jq --arg` — never string-interpolated (JSON injection prevention)
+- Name validation regex: `^[a-z][a-z0-9]*(-[a-z0-9]+)*$` — enforced in `init.sh`, not SKILL.md
 - Path canonicalization via `realpath --canonicalize-missing` — prevents traversal
-- Reserved names enforced in `init.sh`, not server-side
+- `plugin-init` uses `--no-create` flag to re-enter script for skill creation + marketplace registration without re-running plugin creation
+
+## Repository Layout
+
+```
+.claude-plugin/marketplace.json     ← marketplace catalog
+scaffold-skills/                    ← the plugin
+  .claude-plugin/plugin.json
+  skills/
+    marketplace-init/
+      SKILL.md
+      scripts/init.sh
+      docs/                         ← schema, validation, distribution, sources, versioning
+    plugin-init/
+      SKILL.md
+      scripts/init.sh
+      docs/                         ← schema, components, skill-authoring, distribution, dependencies
+docs/
+  raw/                              ← upstream Claude Code docs (source material for distilled docs)
+  decisions/                        ← ADRs (0001 marketplace-init, 0002 plugin-init)
+```
 
 ## Reference Docs
 
-- `skills/marketplace-init/docs/schema.md` — `marketplace.json` field reference
-- `skills/marketplace-init/docs/validation.md` — validation rules & testing
-- `skills/marketplace-init/docs/distribution.md` — hosting & team distribution
-- `docs/decisions/0001-marketplace-init-skill.md` — ADR: design rationale
+- `scaffold-skills/skills/marketplace-init/docs/schema.md` — `marketplace.json` field reference
+- `scaffold-skills/skills/marketplace-init/docs/validation.md` — validation rules & testing
+- `scaffold-skills/skills/marketplace-init/docs/distribution.md` — hosting & distribution
+- `scaffold-skills/skills/plugin-init/docs/schema.md` — `plugin.json` field reference
+- `scaffold-skills/skills/plugin-init/docs/components.md` — all plugin component types
+- `scaffold-skills/skills/plugin-init/docs/skill-authoring.md` — writing effective SKILL.md files
+- `docs/decisions/0001-marketplace-init-skill.md` — ADR for marketplace-init design
+- `docs/decisions/0002-plugin-init-skill.md` — ADR for plugin-init design

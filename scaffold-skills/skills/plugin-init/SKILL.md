@@ -2,9 +2,8 @@
 name: plugin-init
 description: Use when creating a new Claude Code plugin, scaffolding a plugin directory structure, initializing a new plugin with skills or agents, or setting up a plugin to distribute through a marketplace.
 arguments: [name, dir, description, author-name, author-email, skill-name, skill-description]
-argument-hint: [name] [dir] [description] [author-name] [author-email] [skill-name] [skill-description]
+argument-hint: "[name] [dir] [description] [author-name] [author-email] [skill-name] [skill-description]"
 allowed-tools: Bash(bash *) Bash(claude *)
-disable-model-invocation: true
 ---
 
 # Plugin Init

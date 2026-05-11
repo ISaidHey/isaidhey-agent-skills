@@ -173,14 +173,39 @@ register_plugin() {
     source="./$rel"
   fi
 
+  # Discover skills in the plugin's skills/ directory
+  local skills_json="null"
+  if [[ -d "$DIR/skills" ]]; then
+    local skills_arr="[]"
+    while IFS= read -r skill_md; do
+      local skill_dir skill_rel
+      skill_dir="$(dirname "$skill_md")"
+      skill_rel="$(realpath --relative-to="$DIR" "$skill_dir")"
+      skills_arr=$(jq -n --argjson arr "$skills_arr" --arg s "./$skill_rel" '$arr + [$s]')
+    done < <(find "$DIR/skills" -mindepth 2 -maxdepth 2 -name "SKILL.md" | sort)
+    if [[ "$(jq 'length' <<< "$skills_arr")" -gt 0 ]]; then
+      skills_json="$skills_arr"
+    fi
+  fi
+
   # Append plugin entry to marketplace.json
   local updated
-  updated=$(jq \
-    --arg name "$OPT_NAME" \
-    --arg src  "$source" \
-    --arg desc "$OPT_DESCRIPTION" \
-    '.plugins += [{"name":$name,"source":$src,"description":$desc}]' \
-    "$marketplace_json")
+  if [[ "$skills_json" != "null" ]]; then
+    updated=$(jq \
+      --arg  name   "$OPT_NAME" \
+      --arg  src    "$source" \
+      --arg  desc   "$OPT_DESCRIPTION" \
+      --argjson skills "$skills_json" \
+      '.plugins += [{"name":$name,"source":$src,"description":$desc,"skills":$skills}]' \
+      "$marketplace_json")
+  else
+    updated=$(jq \
+      --arg name "$OPT_NAME" \
+      --arg src  "$source" \
+      --arg desc "$OPT_DESCRIPTION" \
+      '.plugins += [{"name":$name,"source":$src,"description":$desc}]' \
+      "$marketplace_json")
+  fi
   echo "$updated" > "$marketplace_json"
 
   RESULT_REGISTERED=true
