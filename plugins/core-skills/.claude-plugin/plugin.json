@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "isaidhey",
+  "description": "Day to day core useful skills.",
+  "version": "1.0.0",
+  "author": {
+    "name": "isaidhey"
+  }
+}

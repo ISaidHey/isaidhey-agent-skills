@@ -6,9 +6,9 @@ Guidance for Claude Code (claude.ai/code) working in this repo.
 
 Claude Code plugin marketplace. Two plugins:
 
-**`scaffold-skills`** — scaffolding plugin:
-- `scaffold-skills:marketplace-init` — interactive scaffold for `marketplace.json`
-- `scaffold-skills:plugin-init` — interactive scaffold for plugin dir + optional skill + optional marketplace registration
+**`isaidhey-scaffolding`** — scaffolding plugin:
+- `isaidhey-scaffolding:marketplace-init` — interactive scaffold for `marketplace.json`
+- `isaidhey-scaffolding:plugin-init` — interactive scaffold for plugin dir + optional skill + optional marketplace registration
 
 **`isaidhey`** (`core-skills/`) — core day-to-day skills:
 - `isaidhey:decided` — canonical cross-project ADR documenter

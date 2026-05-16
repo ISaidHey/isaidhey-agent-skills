@@ -1,5 +1,6 @@
 {
-  "name": "scaffold-skills",
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "isaidhey-scaffolding",
   "description": "Collection of skills for scaffolding various claude code needs",
   "version": "1.0.0",
   "author": {

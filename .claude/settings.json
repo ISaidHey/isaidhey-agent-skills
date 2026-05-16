@@ -1,6 +1,15 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "extraKnownMarketplaces": {
+    "isaidhey-agent-skills": {
+      "source": {
+        "source": "directory",
+        "path": "./"
+      }
+    }
+  },
   "enabledPlugins": {
-    "scaffold-skills@isaidhey-agent-skills": true,
+    "isaidhey-scaffolding@isaidhey-agent-skills": true,
     "isaidhey@isaidhey-agent-skills": true
   }
 }

@@ -8,21 +8,16 @@
   },
   "plugins": [
     {
-      "name": "scaffold-skills",
-      "source": "./scaffold-skills",
+      "name": "isaidhey-scaffolding",
+      "source": "./plugins/scaffold-skills",
       "description": "Collection of skills for scaffolding various claude code needs",
-      "skills": [
-        "./skills/marketplace-init",
-        "./skills/plugin-init"
-      ]
+      "strict": true
     },
     {
       "name": "isaidhey",
-      "source": "./core-skills",
+      "source": "./plugins/core-skills",
       "description": "Core skills for day to day processes",
-      "skills": [
-        "./skills/decided"
-      ]
+      "strict": true
     }
   ]
 }
