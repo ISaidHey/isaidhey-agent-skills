@@ -1,0 +1,9 @@
+{
+  "name": "wiki-mgmt",
+  "description": "Skills necessary for managing the llm-wiki.",
+  "version": "1.0.0",
+  "author": {
+    "name": "isaidhey",
+    "email": "11413282+ISaidHey@users.noreply.github.com"
+  }
+}

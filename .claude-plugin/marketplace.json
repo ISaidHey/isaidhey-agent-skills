@@ -18,6 +18,18 @@
       "source": "./plugins/core-skills",
       "description": "Core skills for day to day processes",
       "strict": true
+    },
+    {
+      "name": "wiki-init",
+      "source": "./plugins/llm-wiki-init",
+      "description": "Initializes the llm-wiki",
+      "strict": true
+    },
+    {
+      "name": "wiki-mgmt",
+      "source": "./plugins/llm-wiki-mgmt",
+      "description": "Skills for managing the llm-wiki",
+      "strict": true
     }
   ]
 }

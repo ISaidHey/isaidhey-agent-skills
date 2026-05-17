@@ -1,0 +1,9 @@
+{
+  "name": "wiki-init",
+  "description": "Initializes the llm-wiki, uninstall after use.",
+  "version": "1.0.0",
+  "author": {
+    "name": "isaidhey",
+    "email": "11413282+ISaidHey@users.noreply.github.com"
+  }
+}

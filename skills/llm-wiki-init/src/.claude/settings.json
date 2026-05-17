@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "extraKnownMarketplaces": {
+    "isaidhey-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "isaidhey/isaidhey-agent-skills"
+      }
+    }
+  }
+}
